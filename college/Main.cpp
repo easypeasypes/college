@@ -1,134 +1,72 @@
 #include <iostream>
 #include <Windows.h>
-int check(int year) {
-    if (year % 400 == 0) {
-        return 1;
-    }
-    if (year % 100 == 0) {
+int main() {SetConsoleCP(CP_UTF8); SetConsoleOutputCP(CP_UTF8); srand(time(NULL));
+    const int zapas[2]{ 300, 1000 };
+    const int doptank[2]{ 0, 100 };
+    const int maxkg[2]{ 2000, 3000 };
+    int fuel[2][3][2]{
+        {{750, 1},
+         {1500, 4},
+         {2000, 7}},
+
+        {{1000, 2},
+         {2000, 4},
+         {3000, 6}}
+    };
+    int choice = 0;
+    int distAB = 0, distBC = 0, weight = 0;
+    std::cout << "1) Самолёт №1\nЁмкость бака - 300 литров\nПотребление топлива в зависимости от веса груза :\n- до 750 кг : 1 литр / км\n- до 1500 кг : 4 литра / км\n- до 2000 кг : 7 литров / км.\n- более 2000 кг – самолет не поднимает";
+    std::cout << "\n2) Самолёт №2\nЁмкость бака - 1000 литров\nПотребление топлива в зависимости от веса груза :\n- до 1000 кг : 2 литра / км\n- до 2000 кг : 4 литра / км\n- до 3000 кг : 6 литров / км.\n- более 3000 кг – самолет не поднимает";
+    std::cout << "\n\nВыберите номер самолёта (1 или 2): ";
+    std::cin >> choice;
+    if (choice != 1 && choice != 2) {
+        std::cout << "Неверный номер самолёта" << std::endl;
         return 0;
     }
-    if (year % 4 == 0) {
-        return 1;
+    int massivvibor = choice - 1;
+    std::cout << "Введите вес груза (кг): ";
+    std::cin >> weight;
+    if (weight > maxkg[massivvibor] || weight <= 0) {
+        std::cout << "Самолет не поднимет такой вес" << std::endl;
+        return 0;
     }
-    return 0;
-}
-int countDays(int day, int month, int year) {
-    int totalDays = 0;
-    for (int i = 1; i < year; i++) {
-        if (check(i) == 1) {
-            totalDays = totalDays + 366;
-        }
-        else {
-            totalDays = totalDays + 365;
-        }
+    std::cout << "Введите расстояние от А до В (км): ";
+    std::cin >> distAB;
+    std::cout << "Введите расстояние от В до С (км): ";
+    std::cin >> distBC;
+    if (distAB < 0 || distBC < 0) {
+        std::cout << "Расстояние не может быть в -" << std::endl;
+        return 0;
     }
-    for (int month = 1; month < month; month++) {
-        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-            totalDays = totalDays + 31;
-        }
-        if (month == 4 || month == 6 || month == 9 || month == 11) {
-            totalDays = totalDays + 30;
-        }
-        if (month == 2) {
-            if (check(year) == 1) {
-                totalDays = totalDays + 29;
-            }
-            else {
-                totalDays = totalDays + 28;
-            }
+    int ispolzovanie = 0;
+    for (int i = 0; i < 3; ++i) {
+        if (weight <= fuel[massivvibor][i][0]) {
+            ispolzovanie = fuel[massivvibor][i][1];
+            break;
         }
     }
-    totalDays = totalDays + day;
-    return totalDays;
-}
-int calculateor3000(int day1, int month1, int year1, int day2, int month2, int year2) {
-    int days1 = countDays(day1, month1, year1);
-    int days2 = countDays(day2, month2, year2);
-    int result = days2 - days1;
-    if (result < 0) {
-        result--;
+    int fuelAB = distAB * ispolzovanie;
+    int fuelstart = zapas[massivvibor] + doptank[massivvibor];
+    if (fuelAB > fuelstart) {
+        std::cout << "Не хватит топлива, чтобы долететь до В" << std::endl;
+        return 0;
     }
-    return result;
-}
-void printDays(int finalDays) {
-    std::cout << "Разница между датами в днях: " << finalDays << std::endl;
-}
-int calculateorArr(int arr[], int size) {
-    int sum = 0;
-    for (int i = 0; i < size; i++) {
-        sum = sum + arr[i];
+    int fuelostatok = fuelstart - fuelAB;
+    if (fuelostatok > zapas[massivvibor]) {
+        fuelostatok = zapas[massivvibor];
     }
-    double avg = (double)sum / size;
-    return avg;
-}
-void printAvg(double result) {
-    std::cout << "Среднее арифметическое элементов массива: " << result << "\n";
-}
-void schitatel(int arr[], int size) {
-    int nol = 0, pol = 0, min = 0;
-    for (int i = 0; i < size; i++){
-        if (arr[i] == 0) {
-            nol++;
-        }
-        else if (arr[i] >= 1) {
-            pol++;
-        }
-        else if (arr[i] < 0) {
-            min++;
-        }
+    int fuelBC = distBC * ispolzovanie;
+    if (fuelBC > zapas[massivvibor]) {
+        std::cout << "Основного бака не хватит для участка В-С даже при полной заправке\n";
+        return 0;
     }
-    std::cout << "Положительных: " << pol << " Отрицательных: " << min << " Нулей: " << nol;
-}
-int main()
-{
-    SetConsoleCP(CP_UTF8); SetConsoleOutputCP(CP_UTF8); srand(time(NULL));
-    int dz = 0;
-    std::cout << "Введите номер задания: ";
-    std::cin >> dz;
-    if (dz == 1) {
-        system("cls");
-        int day1, month1, year1;
-        int day2, month2, year2;
-        std::cout << "Введите первую дату (день месяц год через пробел): \n";
-        std::cin >> day1;
-        std::cin >> month1;
-        std::cin >> year1;
-        std::cout << "Введите вторую дату (день месяц год через пробел): \n";
-        std::cin >> day2;
-        std::cin >> month2;
-        std::cin >> year2;
-        int answer = calculateor3000(day1, month1, year1, day2, month2, year2);
-        printDays(answer);
+    int refuelneed = 0;
+    if (fuelostatok < fuelBC) {
+        refuelneed = fuelBC - fuelostatok;
     }
-    else if (dz == 2) {
-        system("cls");
-        const int size = 5;
-        int count = size;
-        int arr[size]{};
-        for (int i = 0; i < size; i++){
-            arr[i] = rand() % 11;
-            std::cout << arr[i] << " ";
-        }
-        std::cout << "\n";
-        double average = calculateorArr(arr, count);
-        printAvg(average);
-    }
-    else if (dz == 3) {
-        system("cls");
-        const int size = 5;
-        int count = size;
-        int arr[size]{};
-        for (int i = 0; i < size; i++) {
-            arr[i] = rand() % 5 - 2;
-            std::cout << arr[i] << " ";
-        }
-        std::cout << "\n";
-        schitatel(arr, size);
-        std::cout << "\n";
-    }
-    else {
-        system("cls");
-        std::cout << "Число нэ правыльно";
-    }
+    system("cls");
+    std::cout << "Расход топлива: " << ispolzovanie << " л/км\n";
+    std::cout << "Остаток топлива в основном баке при прилете в В (доп. бак сброшен): " << fuelostatok << " л\n";
+    std::cout << "Минимальное количество топлива для дозаправки в В: " << refuelneed << " л\n";
     return 0;
 }
